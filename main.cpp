@@ -11,14 +11,15 @@
 
 #include "GraphAPI.hpp"
 
-using std::fstream;
-
 int main()
 {
-	std::string source = "source.dat";
-	Graph A;
-	A.set_title("Test").set_grid(1).set_numMinorTicks(1).set_Label('x', "base").set_Label('y', "exponent").createLivePlot(source);
+	Graph a;
+	std::string source = "C:\\SourceFiles\\source.dat";
+	std::ofstream file(source);
+	std::vector<PlotObject> items = { PlotObject(source, "GOOGL", 1, 2), PlotObject(source, "MSFT", 1, 3), PlotObject(source, "TSLA", 1, 4) };
+	a.createLiveMultiplot(items);
 
+	a.demo3Multiplot();
 	return 0;
 }
 

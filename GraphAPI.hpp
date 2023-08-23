@@ -11,33 +11,47 @@ using std::string;
 using std::vector;
 
 class Graph {
- public:
-	 // Default Constructor
-	 inline Graph() : _gp(GNUPLOT_FILE_PATH) {}
+public:
+	// Constructors
+	inline Graph() : _gp(GNUPLOT_FILE_PATH) {}
+	inline Graph(PlotObject data) : _gp(GNUPLOT_FILE_PATH) { createLivePlot(data); }
+	inline Graph(const vector<PlotObject>& dataSet) : _gp(GNUPLOT_FILE_PATH) { createLivePlot(dataSet); }
 
-	 // Setters:
-	 Graph& set_Label(char axis, std::string_view label);
-	 Graph& set_Range(char axis, int lowBound, int upBound);
+	// Setters:
+	Graph& set_Label(char axis, std::string_view label);
+	Graph& set_Range(char axis, int lowBound, int upBound);
 
-	 Graph& set_TickMarks(char axis, int frequency);
-	 Graph& setNew_TickMark(char axis, TickObject obj);
-	 Graph& setAll_TickMarks(char axis, const vector<TickObject>& ticks);
-	 Graph& set_numMinorTicks(int num);
+	Graph& set_TickMarks(char axis, int frequency);
+	Graph& setNew_TickMark(char axis, TickObject obj);
+	Graph& setAll_TickMarks(char axis, const vector<TickObject>& ticks);
+	Graph& set_numMinorTicks(int num);
 
-	 Graph& set_title(std::string_view title);
-	 Graph& set_grid(bool b);
-	 Graph& set_autoscale();
-	 Graph& replot();
+	Graph& set_title(std::string_view title);
+	Graph& set_grid(bool b);
+	Graph& set_autoscale();
+	Graph& set_LargeTerminal();
+	Graph& replot();
+	Graph& flush();
 
-	 Graph& createLivePlot(std::string source);
-	 Graph& createLiveMultiplot(vector<std::string> sources);
+	Graph& createPlot(const PlotObject& oneSetData);
+	Graph& createPlot(const vector<PlotObject>& dataSet);
+	Graph& createLivePlot(const PlotObject& oneSetData);
+	Graph& createLivePlot(const vector<PlotObject>& dataSet);
 
-	 // demo functions for reference
-	 void demo1RandomTwoLineChart();
-	 void demo2Multiplot();
+	Graph& createMultiplot(const vector<PlotObject>& dataSet);
+	Graph& createMultiplot(const vector<vector<PlotObject>>& dataSets);
+	Graph& createLiveMultiplot(const vector<PlotObject>& dataSet);
+	Graph& createLiveMultiplot(const vector<vector<PlotObject>>& dataSets);
 
- private:
-	 Gnuplot _gp;
+	// demo functions for reference
+	void demo1RandomTwoLineChart();
+	void demo2Multiplot();
+	void demo3Multiplot();
+
+private:
+	Gnuplot _gp;
 };
+
+std::pair<int, int> generateLayout(int size);
 
 #endif

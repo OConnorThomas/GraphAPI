@@ -72,15 +72,55 @@ Graph& Graph::set_autoscale() {
 	return *this;
 }
 
+Graph& Graph::set_LargeTerminal() {
+	_gp << "set term qt size 1500, 800\n ";
+	return *this;
+}
+
 Graph& Graph::replot() {
 	_gp << "replot\n ";
 	return *this;
 }
 
-// must go at the end of your call chains
-// keybind 'x' to close graph window
-Graph& Graph::createLivePlot(std::string source) {
-	_gp << "plot '" << source << "' using 1:2 title \"" << source << "\" with lines\n ";
+Graph& Graph::flush() {
+	_gp.flush();
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createPlot(const PlotObject& oneSetData) {
+	_gp << "plot '" << oneSetData._filePath << "' using " << oneSetData._x << ':'
+		<< oneSetData._y << " title \"" << oneSetData._lineTitle << "\" with lines lw 3\n ";
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createPlot(const vector<PlotObject>& dataSet) {
+	_gp << "plot ";
+	for (size_t i = 0; i < dataSet.size(); i++) {
+		_gp << '\'' << dataSet[i]._filePath << "' using " << dataSet[i]._x << ':'
+			<< dataSet[i]._y << " title \"" << dataSet[i]._lineTitle << "\" with lines lw 3";
+		if (i + 1 != dataSet.size()) _gp << ",\\\n ";
+		else _gp << '\n';
+	}
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
+	createPlot(oneSetData);
+	_gp << "done = 0\n ";
+	_gp << "bind all 'x' 'done = 1'\n ";
+	_gp << "while (!done) {\n ";
+	_gp << "pause " << oneSetData._refreshRate << "\n ";
+	_gp << "replot\n ";
+	_gp << "}\n ";
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createLivePlot(const vector<PlotObject>& dataSet) {
+	createPlot(dataSet);
 	_gp << "done = 0\n ";
 	_gp << "bind all 'x' 'done = 1'\n ";
 	_gp << "while (!done) {\n ";
@@ -90,16 +130,72 @@ Graph& Graph::createLivePlot(std::string source) {
 	return *this;
 }
 
+// end of call chains | 'x' to close
+Graph& Graph::createMultiplot(const vector<PlotObject>& dataSet) {
+	std::pair<int, int> layout = generateLayout(dataSet.size());
+	_gp << "set multiplot layout " << layout.first << ", " << layout.second << " title \"Live Multiplot\" font \", 14\"\n ";
+	for (auto item : dataSet) {
+		_gp << "plot '" << item._filePath << "' using " << item._x << ':'
+			<< item._y << " title \"" << item._lineTitle << "\" with lines lw 3\n ";
+	}
+	_gp << "unset multiplot\n ";
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createMultiplot(const vector<vector<PlotObject>>& dataSets) {
+	std::pair<int, int> layout = generateLayout(dataSets.size());
+	_gp << "set multiplot layout " << layout.first << ", " << layout.second << " title \"Live Multiplot\" font \", 14\"\n ";
+	for (auto item : dataSets) {
+		_gp << "plot ";
+		for (size_t i = 0; i < item.size(); i++) {
+			_gp << '\'' << item[i]._filePath << "' using " << item[i]._x << ':'
+				<< item[i]._y << " title \"" << item[i]._lineTitle << "\" with lines lw 3";
+			if (i + 1 != item.size()) _gp << ",\\\n ";
+			else _gp << '\n';
+		}
+	}
+	_gp << "unset multiplot\n ";
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createLiveMultiplot(const vector<PlotObject>& dataSet) {
+	_gp << "done = 0\n ";
+	_gp << "bind all 'x' 'done = 1'\n ";
+	_gp << "while (!done) {\n ";
+	createMultiplot(dataSet);
+	_gp << "pause 1\n ";
+	_gp << "}\n ";
+	return *this;
+}
+
+// end of call chains | 'x' to close
+Graph& Graph::createLiveMultiplot(const vector<vector<PlotObject>>& dataSets) {
+	_gp << "done = 0\n ";
+	_gp << "bind all 'x' 'done = 1'\n ";
+	_gp << "while (!done) {\n ";
+	createMultiplot(dataSets);
+	_gp << "pause 1\n ";
+	_gp << "}\n ";
+	return *this;
+}
 
 
 
 
-
-
+// Helper Functions:
+std::pair<int, int> generateLayout(int size) {
+	if (size % 9 == 0 || size == 12) return std::pair<int, int>(3, size / 3);
+	else if (size % 2 == 0) return std::pair<int, int>(2, size / 2);
+	else return std::pair<int, int>(1, size);
+}
 
 #include <numeric>
 #include <iostream>
 #include <random>
+#include <chrono>
+#include <thread>
 
 void Graph::demo1RandomTwoLineChart() {
 	Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
@@ -144,4 +240,25 @@ void Graph::demo2Multiplot() {
 	gp << "pause 3\n ";
 	gp << "reread\n ";
 	gp << "}\n ";
+}
+
+void Graph::demo3Multiplot() {
+	std::string source = "C:\\SourceFiles\\source.dat";
+	std::ofstream file(source);
+	std::vector<PlotObject> items = { PlotObject(source, "Joesef", 1, 2), PlotObject(source, 1, 3), PlotObject(source, "Stevenne", 1, 4) };
+	std::vector<std::vector<PlotObject>> bundle;
+	for (int i = 0; i < 6; i++) bundle.push_back(items);
+	Graph A;
+	A.set_title("Example 3").createLiveMultiplot(bundle);
+
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::normal_distribution<double> nd(0., 1.);
+
+	for (int i = 0; i < 100; i++) {
+		file << i << ' ' << nd(mt) << ' ' << nd(mt) * i * 0.2 << ' ' << nd(mt) * i * (-0.2) << std::endl;
+		file.flush();
+		A.flush();
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
 }
