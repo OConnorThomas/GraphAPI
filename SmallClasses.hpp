@@ -47,7 +47,7 @@ public:
 
 	// source name
 	string _filePath, _lineTitle;
-	// xAxis & yAxis columns
+	// xAxis & yAxis columns (indicies for graph reference)
 	int _x = 1, _y = 2;
 	double _refreshRate = 0.2;
 };
