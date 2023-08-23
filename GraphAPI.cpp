@@ -198,7 +198,7 @@ std::pair<int, int> generateLayout(int size) {
 #include <thread>
 
 void Graph::demo1RandomTwoLineChart() {
-	Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
+	Gnuplot gp(GNUPLOT_FILE_PATH);
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -223,7 +223,7 @@ void Graph::demo1RandomTwoLineChart() {
 }
 
 void Graph::demo2Multiplot() {
-	Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
+	Gnuplot gp(GNUPLOT_FILE_PATH);
 
 	gp << "set multiplot layout 2, 2 columnsfirst margins 0.1, 0.9, 0.1, 0.9 spacing 0.1\n ";
 	gp << "set ylabel 'ylabel'\n ";
@@ -249,7 +249,7 @@ void Graph::demo3Multiplot() {
 	std::vector<std::vector<PlotObject>> bundle;
 	for (int i = 0; i < 6; i++) bundle.push_back(items);
 	Graph A;
-	A.set_title("Example 3").createLiveMultiplot(bundle);
+	A.set_title("Demo 3").createLiveMultiplot(bundle);
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
