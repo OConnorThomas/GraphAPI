@@ -34,13 +34,9 @@ public:
 	Graph& replot();
 	Graph& flush();
 
-	Graph& createPlot(const PlotObject& oneSetData);
-	Graph& createPlot(const vector<PlotObject>& dataSet);
 	Graph& createLivePlot(const PlotObject& oneSetData);
 	Graph& createLivePlot(const vector<PlotObject>& dataSet);
 
-	Graph& createMultiplot(const vector<PlotObject>& dataSet);
-	Graph& createMultiplot(const vector<vector<PlotObject>>& dataSets);
 	Graph& createLiveMultiplot(const vector<PlotObject>& dataSet);
 	Graph& createLiveMultiplot(const vector<vector<PlotObject>>& dataSets);
 
@@ -50,9 +46,9 @@ public:
 	void demo3Multiplot();
 
 private:
+	std::pair<int, int> generateLayout(int size);
+private:
 	Gnuplot _gp;
 };
-
-std::pair<int, int> generateLayout(int size);
 
 #endif

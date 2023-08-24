@@ -16,12 +16,9 @@ int main()
 	Graph DisplayGraph;
 	std::string source = SOURCE_DATA_PATH;
 	std::ofstream file(source);
-	std::vector<PlotObject> items = { PlotObject(source, "GOOGL", 1, 2),
-									  PlotObject(source, "MSFT", 1, 3),
-									  PlotObject(source, "TSLA", 1, 4) };
-	DisplayGraph.createLiveMultiplot(items);
+	file << "1 1\n2 4\n3 9\n4 16\n5 25\n6 36\n";
 
-	DisplayGraph.demo3Multiplot();
+	DisplayGraph.createLivePlot(PlotObject(source));
 	return 0;
 }
 

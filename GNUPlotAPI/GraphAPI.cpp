@@ -54,7 +54,7 @@ Graph& Graph::set_numMinorTicks(int num) {
 
 Graph& Graph::set_title(std::string_view title) {
 	_gp << "set title'" << title << "'\n ";
-	_gp << "set terminal qt title '" << title << "'\n ";
+	_gp << "set terminal wxt title '" << title << "'\n ";
 	// _gp << "set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"#ffcccc\" behind\n ";
 	return *this;
 }
@@ -73,7 +73,8 @@ Graph& Graph::set_autoscale() {
 }
 
 Graph& Graph::set_LargeTerminal() {
-	_gp << "set term qt size 1500, 800\n ";
+	_gp << "set term wxt size 1500, 800\n ";
+	_gp << "set term wxt position 20, 20\n";
 	return *this;
 }
 
@@ -87,28 +88,20 @@ Graph& Graph::flush() {
 	return *this;
 }
 
+// Helper Functions:
+// Hardcodes the size of the graph-array layout for any number of graphs
+std::pair<int, int> Graph::generateLayout(int size) {
+	if (size >= 9 && size % 3 == 0) return std::pair<int, int>(3, size / 3);
+	else if (size % 2 == 0) return std::pair<int, int>(2, size / 2);
+	else return std::pair<int, int>(1, size);
+}
+
+
 // end of call chains | 'x' to close
-Graph& Graph::createPlot(const PlotObject& oneSetData) {
+// single line, single live graph
+Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
 	_gp << "plot '" << oneSetData._filePath << "' using " << oneSetData._x << ':'
 		<< oneSetData._y << " title \"" << oneSetData._lineTitle << "\" with lines lw 3\n ";
-	return *this;
-}
-
-// end of call chains | 'x' to close
-Graph& Graph::createPlot(const vector<PlotObject>& dataSet) {
-	_gp << "plot ";
-	for (size_t i = 0; i < dataSet.size(); i++) {
-		_gp << '\'' << dataSet[i]._filePath << "' using " << dataSet[i]._x << ':'
-			<< dataSet[i]._y << " title \"" << dataSet[i]._lineTitle << "\" with lines lw 3";
-		if (i + 1 != dataSet.size()) _gp << ",\\\n ";
-		else _gp << '\n';
-	}
-	return *this;
-}
-
-// end of call chains | 'x' to close
-Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
-	createPlot(oneSetData);
 	_gp << "done = 0\n ";
 	_gp << "bind all 'x' 'done = 1'\n ";
 	_gp << "while (!done) {\n ";
@@ -119,19 +112,30 @@ Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
 }
 
 // end of call chains | 'x' to close
+// multiple lines, single live graph
 Graph& Graph::createLivePlot(const vector<PlotObject>& dataSet) {
-	createPlot(dataSet);
+	_gp << "plot ";
+	for (size_t i = 0; i < dataSet.size(); i++) {
+		_gp << '\'' << dataSet[i]._filePath << "' using " << dataSet[i]._x << ':'
+			<< dataSet[i]._y << " title \"" << dataSet[i]._lineTitle << "\" with lines lw 3";
+		if (i + 1 != dataSet.size()) _gp << ",\\\n ";
+		else _gp << '\n';
+	}
 	_gp << "done = 0\n ";
 	_gp << "bind all 'x' 'done = 1'\n ";
 	_gp << "while (!done) {\n ";
-	_gp << "pause 0.2\n ";
+	_gp << "pause " << dataSet[0]._refreshRate << "\n ";
 	_gp << "replot\n ";
 	_gp << "}\n ";
 	return *this;
 }
 
 // end of call chains | 'x' to close
-Graph& Graph::createMultiplot(const vector<PlotObject>& dataSet) {
+// single line, multiple live graphs
+Graph& Graph::createLiveMultiplot(const vector<PlotObject>& dataSet) {
+	_gp << "done = 0\n ";
+	_gp << "bind all 'x' 'done = 1'\n ";
+	_gp << "while (!done) {\n ";
 	std::pair<int, int> layout = generateLayout(dataSet.size());
 	_gp << "set multiplot layout " << layout.first << ", " << layout.second << " title \"Live Multiplot\" font \", 14\"\n ";
 	for (auto item : dataSet) {
@@ -139,11 +143,17 @@ Graph& Graph::createMultiplot(const vector<PlotObject>& dataSet) {
 			<< item._y << " title \"" << item._lineTitle << "\" with lines lw 3\n ";
 	}
 	_gp << "unset multiplot\n ";
+	_gp << "pause 1\n ";
+	_gp << "}\n ";
 	return *this;
 }
 
 // end of call chains | 'x' to close
-Graph& Graph::createMultiplot(const vector<vector<PlotObject>>& dataSets) {
+// multiple lines, multiple live graphs
+Graph& Graph::createLiveMultiplot(const vector<vector<PlotObject>>& dataSets) {
+	_gp << "done = 0\n ";
+	_gp << "bind all 'x' 'done = 1'\n ";
+	_gp << "while (!done) {\n ";
 	std::pair<int, int> layout = generateLayout(dataSets.size());
 	_gp << "set multiplot layout " << layout.first << ", " << layout.second << " title \"Live Multiplot\" font \", 14\"\n ";
 	for (auto item : dataSets) {
@@ -156,40 +166,11 @@ Graph& Graph::createMultiplot(const vector<vector<PlotObject>>& dataSets) {
 		}
 	}
 	_gp << "unset multiplot\n ";
-	return *this;
-}
-
-// end of call chains | 'x' to close
-Graph& Graph::createLiveMultiplot(const vector<PlotObject>& dataSet) {
-	_gp << "done = 0\n ";
-	_gp << "bind all 'x' 'done = 1'\n ";
-	_gp << "while (!done) {\n ";
-	createMultiplot(dataSet);
 	_gp << "pause 1\n ";
 	_gp << "}\n ";
 	return *this;
 }
 
-// end of call chains | 'x' to close
-Graph& Graph::createLiveMultiplot(const vector<vector<PlotObject>>& dataSets) {
-	_gp << "done = 0\n ";
-	_gp << "bind all 'x' 'done = 1'\n ";
-	_gp << "while (!done) {\n ";
-	createMultiplot(dataSets);
-	_gp << "pause 1\n ";
-	_gp << "}\n ";
-	return *this;
-}
-
-
-
-
-// Helper Functions:
-std::pair<int, int> generateLayout(int size) {
-	if (size % 9 == 0 || size == 12) return std::pair<int, int>(3, size / 3);
-	else if (size % 2 == 0) return std::pair<int, int>(2, size / 2);
-	else return std::pair<int, int>(1, size);
-}
 
 #include <numeric>
 #include <iostream>
@@ -249,7 +230,7 @@ void Graph::demo3Multiplot() {
 	std::vector<std::vector<PlotObject>> bundle;
 	for (int i = 0; i < 6; i++) bundle.push_back(items);
 	Graph A;
-	A.set_title("Demo 3").createLiveMultiplot(bundle);
+	A.set_LargeTerminal().createLiveMultiplot(bundle);
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
