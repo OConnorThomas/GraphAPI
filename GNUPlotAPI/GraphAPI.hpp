@@ -15,8 +15,8 @@ class Graph {
 public:
 	// Constructors
 	inline Graph() : _gp(GNUPLOT_FILE_PATH) {}
-	inline Graph(PlotObject data) : _gp(GNUPLOT_FILE_PATH) { createLivePlot(data); }
-	inline Graph(const vector<PlotObject>& dataSet) : _gp(GNUPLOT_FILE_PATH) { createLivePlot(dataSet); }
+	inline Graph(PlotObject data) : _gp(GNUPLOT_FILE_PATH) { createPlot(data); }
+	inline Graph(const vector<PlotObject>& dataSet) : _gp(GNUPLOT_FILE_PATH) { createPlot(dataSet); }
 
 	// Setters:
 	Graph& set_Label(char axis, std::string_view label);
@@ -34,11 +34,11 @@ public:
 	Graph& replot();
 	Graph& flush();
 
-	Graph& createLivePlot(const PlotObject& oneSetData);
-	Graph& createLivePlot(const vector<PlotObject>& dataSet);
+	Graph& createPlot(const PlotObject& oneSetData);
+	Graph& createPlot(const vector<PlotObject>& dataSet);
 
-	Graph& createLiveMultiplot(const vector<PlotObject>& dataSet);
-	Graph& createLiveMultiplot(const vector<vector<PlotObject>>& dataSets);
+	Graph& createMultiplot(const vector<PlotObject>& dataSet);
+	Graph& createMultiplot(const vector<vector<PlotObject>>& dataSets);
 
 	// demo functions for reference
 	void demo1RandomTwoLineChart();

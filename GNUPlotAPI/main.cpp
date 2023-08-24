@@ -18,7 +18,7 @@ int main()
 	std::ofstream file(source);
 	file << "1 1\n2 4\n3 9\n4 16\n5 25\n6 36\n";
 
-	DisplayGraph.createLivePlot(PlotObject(source));
+	DisplayGraph.createPlot(PlotObject(source));
 	return 0;
 }
 

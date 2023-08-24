@@ -98,8 +98,8 @@ std::pair<int, int> Graph::generateLayout(int size) {
 
 
 // end of call chains | 'x' to close
-// single line, single live graph
-Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
+// single line, single graph
+Graph& Graph::createPlot(const PlotObject& oneSetData) {
 	_gp << "plot '" << oneSetData._filePath << "' using " << oneSetData._x << ':'
 		<< oneSetData._y << " title \"" << oneSetData._lineTitle << "\" with lines lw 3\n ";
 	_gp << "done = 0\n ";
@@ -112,8 +112,8 @@ Graph& Graph::createLivePlot(const PlotObject& oneSetData) {
 }
 
 // end of call chains | 'x' to close
-// multiple lines, single live graph
-Graph& Graph::createLivePlot(const vector<PlotObject>& dataSet) {
+// multiple lines, single graph
+Graph& Graph::createPlot(const vector<PlotObject>& dataSet) {
 	_gp << "plot ";
 	for (size_t i = 0; i < dataSet.size(); i++) {
 		_gp << '\'' << dataSet[i]._filePath << "' using " << dataSet[i]._x << ':'
@@ -131,8 +131,8 @@ Graph& Graph::createLivePlot(const vector<PlotObject>& dataSet) {
 }
 
 // end of call chains | 'x' to close
-// single line, multiple live graphs
-Graph& Graph::createLiveMultiplot(const vector<PlotObject>& dataSet) {
+// single line, multiple graphs
+Graph& Graph::createMultiplot(const vector<PlotObject>& dataSet) {
 	_gp << "done = 0\n ";
 	_gp << "bind all 'x' 'done = 1'\n ";
 	_gp << "while (!done) {\n ";
@@ -149,8 +149,8 @@ Graph& Graph::createLiveMultiplot(const vector<PlotObject>& dataSet) {
 }
 
 // end of call chains | 'x' to close
-// multiple lines, multiple live graphs
-Graph& Graph::createLiveMultiplot(const vector<vector<PlotObject>>& dataSets) {
+// multiple lines, multiple graphs
+Graph& Graph::createMultiplot(const vector<vector<PlotObject>>& dataSets) {
 	_gp << "done = 0\n ";
 	_gp << "bind all 'x' 'done = 1'\n ";
 	_gp << "while (!done) {\n ";
@@ -230,7 +230,7 @@ void Graph::demo3Multiplot() {
 	std::vector<std::vector<PlotObject>> bundle;
 	for (int i = 0; i < 6; i++) bundle.push_back(items);
 	Graph A;
-	A.set_LargeTerminal().createLiveMultiplot(bundle);
+	A.set_LargeTerminal().createMultiplot(bundle);
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
