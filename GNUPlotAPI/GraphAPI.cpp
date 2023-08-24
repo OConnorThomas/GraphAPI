@@ -243,7 +243,7 @@ void Graph::demo2Multiplot() {
 }
 
 void Graph::demo3Multiplot() {
-	std::string source = "C:\\SourceFiles\\source.dat";
+	std::string source = SOURCE_DATA_PATH;
 	std::ofstream file(source);
 	std::vector<PlotObject> items = { PlotObject(source, "Joesef", 1, 2), PlotObject(source, 1, 3), PlotObject(source, "Stevenne", 1, 4) };
 	std::vector<std::vector<PlotObject>> bundle;

@@ -6,6 +6,7 @@
 #include "SmallClasses.hpp"
 
 #define GNUPLOT_FILE_PATH "\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\""
+#define SOURCE_DATA_PATH "C:\\SourceFiles\\source.dat"
 
 using std::string;
 using std::vector;
